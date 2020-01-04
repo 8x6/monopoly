@@ -47,3 +47,7 @@ Example output after 100,000,000 iterations:
 3639263	GO	Go
 6473647	Just	Visiting
 ```
+
+... looks like the red and orange properties, and the railroads, are the most frequently landed on.  This is likely because of frequent trips to "Jail" which put the player in a position to next land on Orange.
+
+Note that the rule where you can get out of jail by rolling doubles, is not yet implemented.
