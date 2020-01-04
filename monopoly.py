@@ -53,8 +53,8 @@ class Player:
 
     def advance(self, spaces):
         self.position += spaces
-        if self.position >= 40:
-            self.position -= 40
+        self.position = self.position % 40
+        Rules().apply(self)
 
     def advance_to(self, new_position):
         if self.position > new_position:
@@ -97,57 +97,48 @@ class ChanceDeck:
     def shuffle(self):
         self.cards.shuffle()
 
-    def advance_to(self, player, new_position):
-        if player.position > new_position:
-            player.pass_go()
-        player.position = new_position
-        Rules().apply(player)
-
     def go_back_three_spaces(self, player):
-        player.position = player.position - 3
-        if player.position < 0:
-            player.position += 40
-        Rules().apply(player)
+        player.advance(-3)
 
     def go_to_jail(self, player):
-        self.advance_to(player, 10)
+        player.advance_to(10)
         # TODO: do not collect $200
         # TODO: Jail
 
     def advance_to_st_charles_place(self, player):
-        self.advance_to(player, 11)
+        player.advance_to(11)
 
     def advance_to_boardwalk(self, player):
-        self.advance_to(player, 39)
+        player.advance_to(39)
 
     def advance_to_reading_railroad(self, player):
-        self.advance_to(player, 5)
+        player.advance_to(5)
 
     def advance_to_go(self, player):
-        self.advance_to(player, 0)
+        player.advance_to(0)
 
     def advance_to_illinois_ave(self, player):
-        self.advance_to(player, 24)
+        player.advance_to(24)
 
     def advance_to_nearest_railroad(self, player):
-        if player.position <= 5:
-            self.advance_to(player, 5)
-        elif player.position <= 15:
-            self.advance_to(player, 15)
-        elif player.position <= 25:
-            self.advance_to(player, 25)
-        elif player.position <= 35:
-            self.advance_to(player, 35)
+        if player.position < 5:
+            player.advance_to(5)
+        elif player.position < 15:
+            player.advance_to(15)
+        elif player.position < 25:
+            player.advance_to(25)
+        elif player.position < 35:
+            player.advance_to(35)
         else:
-            self.advance_to(player, 5)
+            player.advance_to(5)
 
     def advance_to_nearest_utility(self, player):
         if player.position < 12:
-            self.advance_to(player, 12)
+            player.advance_to(12)
         elif player.position < 28:
-            self.advance_to(player, 28)
+            player.advance_to(28)
         else:
-            self.advance_to(player, 12)
+            player.advance_to(12)
 
     def pas(self, player):
         pass
