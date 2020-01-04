@@ -74,31 +74,13 @@ class Player:
         print(' '.join(["Position %02d:" % self.position] + BOARD[self.position] + ["(roll: %d)" % num]))
    
 
-class ChanceDeck:
+class CardDeck:
 
     cards = None
     current = None
 
     def __init__(self):
-        self.cards = [
-            ['Pay', '15', self.pas],
-            ['Get', 'out of jail free', self.pas],
-            ['Advance', 'to Reading Railroad', self.advance_to_reading_railroad],
-            ['Advance', 'to the nearest Utility', self.advance_to_nearest_utility], 
-            ['Go', 'To Jail', self.go_to_jail],
-            ['Advance', 'to Boardwalk', self.advance_to_boardwalk],
-            ['Pay', 'each player 50', self.pas],
-            ['Advance', 'to Go', self.advance_to_go],
-            ['Advance', 'to Illinoin Ave', self.advance_to_illinois_ave],
-            ['Advance', 'to St. Charles Place', self.advance_to_st_charles_place],
-            ['Collect', '150', self.pas],
-            ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
-            ['Collect', '50', self.pas],
-            ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
-            ['Go', 'back three spaces', self.go_back_three_spaces],
-            ['Pay', 'General Repairs', self.pas],
-        ]
-        random.shuffle(self.cards)
+        raise(NotImplementedError)
 
     def go_back_three_spaces(self, player):
         player.advance(-3)
@@ -157,21 +139,61 @@ class ChanceDeck:
         rule_fn(player)
 
 
-CHANCE_DECK = ChanceDeck()
+class ChanceDeck(CardDeck):
 
+    def __init__(self):
+        self.cards = [
+            ['Pay', '15', self.pas],
+            ['Get', 'out of jail free', self.pas],
+            ['Advance', 'to Reading Railroad', self.advance_to_reading_railroad],
+            ['Advance', 'to the nearest Utility', self.advance_to_nearest_utility],
+            ['Go', 'To Jail', self.go_to_jail],
+            ['Advance', 'to Boardwalk', self.advance_to_boardwalk],
+            ['Pay', 'each player 50', self.pas],
+            ['Advance', 'to Go', self.advance_to_go],
+            ['Advance', 'to Illinoin Ave', self.advance_to_illinois_ave],
+            ['Advance', 'to St. Charles Place', self.advance_to_st_charles_place],
+            ['Collect', '150', self.pas],
+            ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
+            ['Collect', '50', self.pas],
+            ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
+            ['Go', 'back three spaces', self.go_back_three_spaces],
+            ['Pay', 'General Repairs', self.pas],
+        ]
+        random.shuffle(self.cards)
+
+
+class CommunityChestDeck(CardDeck):
+
+    def __init__(self):
+        self.cards = [
+            ['Collect', '100', self.pas],
+            ['Advance', 'to Go', self.advance_to_go],
+            ['Pay', '100', self.pas],
+            ['Collect', '100', self.pas],
+            ['Pay', 'General Repairs', self.pas],
+            ['Collect', '10', self.pas],
+            ['Get', 'out of jail free', self.pas],
+            ['Collect', '200', self.pas],
+            ['Pay', '50', self.pas],
+            ['Collect', '25', self.pas],
+            ['Collect', '50', self.pas],
+            ['Collect', '10 from each player', self.pas],
+            ['Collect', '20', self.pas],
+            ['Pay', '50', self.pas],
+            ['Go', 'To Jail', self.go_to_jail],
+            ['Collect', '100', self.pas],
+        ]
+        random.shuffle(self.cards)
+
+
+CHANCE_DECK = ChanceDeck()
+COMMUNITY_CHEST_DECK = CommunityChestDeck()
 
 class Rules:
+
     def land_on_property(self, player, spot):
         pass
-
-    def chance_or_chest(self, player, spot):
-        type = spot[1]
-        if type == 'Chance':
-            CHANCE_DECK.draw(player)
-        elif type == 'Chest':
-            pass
-        else:
-            raise ValueError(type)
 
     def apply(self, player):
         spot = BOARD[player.position]
@@ -182,12 +204,15 @@ class Rules:
             pass
         elif type in ('Ave', 'Place', 'Railroad', 'Company', 'Works', 'Gardens', 'Boardwalk'):
             self.land_on_property(player, spot)
-        elif type in ('Chest', 'Chance'):
-            self.chance_or_chest(player, spot)
+        elif type == 'Chest':
+            COMMUNITY_CHEST_DECK.draw(player)
+        elif type == 'Chance':
+            CHANCE_DECK.draw(player)
         elif type == 'To Jail':
             player.go_to_jail()
         else:
             raise ValueError(type)
+
 
 class Game:
     def roll(self):
