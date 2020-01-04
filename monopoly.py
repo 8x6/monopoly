@@ -65,6 +65,11 @@ class Player:
     def pass_go(self):
         pass
 
+    def go_to_jail(self):
+        # TODO: do not collect $200
+        # TODO: Jail
+        self.advance_to(10)
+
     def tell(self, num):
         print(' '.join(["Position %02d:" % self.position] + BOARD[self.position] + ["(roll: %d)" % num]))
    
@@ -75,35 +80,31 @@ class ChanceDeck:
     current = None
 
     def __init__(self):
-      self.cards = [
-        ['Pay', '15', self.pas],
-        ['Get', 'out of jail free', self.pas],
-        ['Advance', 'to Reading Railroad', self.advance_to_reading_railroad],
-        ['Advance', 'to the nearest Utility', self.advance_to_nearest_utility], 
-        ['Go', 'To Jail', self.go_to_jail],
-        ['Advance', 'to Boardwalk', self.advance_to_boardwalk],
-        ['Pay', 'each player 50', self.pas],
-        ['Advance', 'to Go', self.advance_to_go],
-        ['Advance', 'to Illinoin Ave', self.advance_to_illinois_ave],
-        ['Advance', 'to St. Charles Place', self.advance_to_st_charles_place],
-        ['Collect', '150', self.pas],
-        ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
-        ['Collect', '50', self.pas],
-        ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
-        ['Go', 'back three spaces', self.go_back_three_spaces],
-        ['Pay', 'General Repairs', self.pas],
-      ]
-
-    def shuffle(self):
-        self.cards.shuffle()
+        self.cards = [
+            ['Pay', '15', self.pas],
+            ['Get', 'out of jail free', self.pas],
+            ['Advance', 'to Reading Railroad', self.advance_to_reading_railroad],
+            ['Advance', 'to the nearest Utility', self.advance_to_nearest_utility], 
+            ['Go', 'To Jail', self.go_to_jail],
+            ['Advance', 'to Boardwalk', self.advance_to_boardwalk],
+            ['Pay', 'each player 50', self.pas],
+            ['Advance', 'to Go', self.advance_to_go],
+            ['Advance', 'to Illinoin Ave', self.advance_to_illinois_ave],
+            ['Advance', 'to St. Charles Place', self.advance_to_st_charles_place],
+            ['Collect', '150', self.pas],
+            ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
+            ['Collect', '50', self.pas],
+            ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
+            ['Go', 'back three spaces', self.go_back_three_spaces],
+            ['Pay', 'General Repairs', self.pas],
+        ]
+        random.shuffle(self.cards)
 
     def go_back_three_spaces(self, player):
         player.advance(-3)
 
     def go_to_jail(self, player):
-        player.advance_to(10)
-        # TODO: do not collect $200
-        # TODO: Jail
+        player.go_to_jail()
 
     def advance_to_st_charles_place(self, player):
         player.advance_to(11)
@@ -155,7 +156,9 @@ class ChanceDeck:
         rule_fn = card[2]
         rule_fn(player)
 
+
 CHANCE_DECK = ChanceDeck()
+
 
 class Rules:
     def land_on_property(self, player, spot):
@@ -181,11 +184,8 @@ class Rules:
             self.land_on_property(player, spot)
         elif type in ('Chest', 'Chance'):
             self.chance_or_chest(player, spot)
-
         elif type == 'To Jail':
-            print("Going to Jail")
-            player.position = 10
-            player.turns_left_in_jail = 3
+            player.go_to_jail()
         else:
             raise ValueError(type)
 
