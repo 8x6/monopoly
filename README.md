@@ -6,6 +6,7 @@ python ./monopoly.py | tail -45 | sort -n
 
 Example output after 100,000,000 iterations:
 
+```
 197491	Chance	Chance
 217833	Chance	Chance
 270381	Chance	Chance
@@ -45,4 +46,4 @@ Example output after 100,000,000 iterations:
 3418398	Illinois	Ave
 3639263	GO	Go
 6473647	Just	Visiting
-
+```
