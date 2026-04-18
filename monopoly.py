@@ -220,7 +220,7 @@ class Game:
 
     def demo_1(self):
         for ix in range(100):
-            print self.roll()
+            print(self.roll())
 
         for ix in (0, 10, 20, 30):
             print(BOARD[ix])
