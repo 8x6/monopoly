@@ -155,7 +155,7 @@ class ChanceDeck(CardDeck):
             ['Advance', 'to Boardwalk', self.advance_to_boardwalk],
             ['Pay', 'each player 50', self.pas],
             ['Advance', 'to Go', self.advance_to_go],
-            ['Advance', 'to Illinoin Ave', self.advance_to_illinois_ave],
+            ['Advance', 'to Illinois Ave', self.advance_to_illinois_ave],
             ['Advance', 'to St. Charles Place', self.advance_to_st_charles_place],
             ['Collect', '150', self.pas],
             ['Advance', 'to the nearest Railroad', self.advance_to_nearest_railroad],
@@ -251,7 +251,7 @@ class Game:
     def test_3(self):
         counts = [0] * 40
         p = Player()
-        for ix in range(1000000):
+        for ix in range(100000000):
             self.take_turn(p)
             counts[p.position] += 1
         for ix in range(40):
