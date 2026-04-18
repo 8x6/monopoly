@@ -44,7 +44,11 @@ BOARD = [
   ['Boardwalk', 'Boardwalk'],
 ]
 
+import os
 import random
+
+VERBOSE = os.getenv("MONOPOLY_VERBOSE") == "1"
+SPACE_KIND = [spot[1] for spot in BOARD]
 
 
 class Player:
@@ -52,15 +56,14 @@ class Player:
     turns_left_in_jail = None
 
     def advance(self, spaces):
-        self.position += spaces
-        self.position = self.position % 40
-        Rules().apply(self)
+        self.position = (self.position + spaces) % 40
+        RULES.apply(self)
 
     def advance_to(self, new_position):
         if self.position > new_position:
             self.pass_go()
         self.position = new_position
-        Rules().apply(self)
+        RULES.apply(self)
 
     def pass_go(self):
         pass
@@ -68,10 +71,12 @@ class Player:
     def go_to_jail(self):
         # TODO: do not collect $200
         # TODO: Jail
-        self.advance_to(10)
+        # Going to jail is a direct move and should not be treated as passing GO.
+        self.position = 10
 
     def tell(self, num):
-        print(' '.join(["Position %02d:" % self.position] + BOARD[self.position] + ["(roll: %d)" % num]))
+        if VERBOSE:
+            print(' '.join(["Position %02d:" % self.position] + BOARD[self.position] + ["(roll: %d)" % num]))
    
 
 class CardDeck:
@@ -130,11 +135,10 @@ class CardDeck:
         if self.current is None:
             self.current = 0
         else:
-            self.current += 1
-            if self.current >= len(self.cards):
-                self.current = 0
+            self.current = (self.current + 1) % len(self.cards)
         card = self.cards[self.current]
-        print(' '.join((card[0], card[1])))
+        if VERBOSE:
+            print(' '.join((card[0], card[1])))
         rule_fn = card[2]
         rule_fn(player)
 
@@ -196,22 +200,24 @@ class Rules:
         pass
 
     def apply(self, player):
-        spot = BOARD[player.position]
-        type = spot[1]
-        if type in ('Go', 'Visiting', 'Parking'):
+        kind = SPACE_KIND[player.position]
+        if kind in ('Go', 'Visiting', 'Parking'):
             pass
-        elif type == 'Tax':
+        elif kind == 'Tax':
             pass
-        elif type in ('Ave', 'Place', 'Railroad', 'Company', 'Works', 'Gardens', 'Boardwalk'):
-            self.land_on_property(player, spot)
-        elif type == 'Chest':
+        elif kind in ('Ave', 'Place', 'Railroad', 'Company', 'Works', 'Gardens', 'Boardwalk'):
+            self.land_on_property(player, BOARD[player.position])
+        elif kind == 'Chest':
             COMMUNITY_CHEST_DECK.draw(player)
-        elif type == 'Chance':
+        elif kind == 'Chance':
             CHANCE_DECK.draw(player)
-        elif type == 'To Jail':
+        elif kind == 'To Jail':
             player.go_to_jail()
         else:
-            raise ValueError(type)
+            raise ValueError(kind)
+
+
+RULES = Rules()
 
 
 class Game:
@@ -234,8 +240,8 @@ class Game:
     def take_turn(self, player):
         roll = self.roll()
         player.advance(roll)
-        player.tell(roll)
-        Rules().apply(player)
+        if VERBOSE:
+            player.tell(roll)
 
     def test_2(self):
         p = Player()
@@ -251,4 +257,5 @@ class Game:
         for ix in range(40):
             print("\t".join([str(counts[ix])] + BOARD[ix]))
 
-Game().test_3()
+if __name__ == "__main__":
+    Game().test_3()

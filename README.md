@@ -2,7 +2,7 @@
 Which properties get landed on most frequently?
 
 
-python ./monopoly.py | tail -45 | sort -n
+python3 ./monopoly.py | tail -45 | sort -n
 
 Example output after 100,000,000 iterations:
 
